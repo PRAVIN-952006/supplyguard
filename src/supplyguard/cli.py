@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     try:
         document = load_document(args.input)
-        format_name, components, metadata = parse_components(document, str(args.input))
+        format_name, components, metadata, references = parse_components(document, str(args.input))
         result = audit(
             format_name,
             components,
@@ -41,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
                 require_license=args.require_license,
                 max_components_without_version=args.max_missing_version,
             ),
+            references,
         )
     except SBOMParseError as exc:
         print(f"error: {exc}", file=sys.stderr)

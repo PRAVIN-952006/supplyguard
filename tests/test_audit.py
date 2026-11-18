@@ -9,8 +9,8 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 def result_for(name: str, policy: Policy | None = None):
     document = load_document(FIXTURES / name)
-    format_name, components, metadata = parse_components(document, name)
-    return audit(format_name, components, metadata, policy or Policy())
+    format_name, components, metadata, references = parse_components(document, name)
+    return audit(format_name, components, metadata, policy or Policy(), references)
 
 
 def test_valid_cyclonedx_passes():
@@ -39,3 +39,8 @@ def test_spdx_package_url_is_supported():
 def test_json_output_is_serializable():
     result = result_for("valid-cyclonedx.json")
     json.dumps(result.as_dict())
+
+
+def test_unknown_dependency_reference_is_error():
+    result = result_for("unknown-reference.json")
+    assert any(item.rule_id == "SG011" for item in result.findings)

@@ -24,14 +24,27 @@ def audit(
     components: Iterable[Component],
     metadata: dict[str, object],
     policy: Policy,
+    references: Iterable[str] = (),
 ) -> AuditResult:
     component_list = list(components)
-    result = AuditResult(format=format_name, components=component_list, metadata=metadata)
+    reference_list = tuple(references)
+    result = AuditResult(
+        format=format_name,
+        components=component_list,
+        references=reference_list,
+        metadata=metadata,
+    )
     if not component_list:
         result.findings.append(Finding("SG001", "error", "SBOM contains no components"))
         return result
 
     refs = Counter(component.ref for component in component_list)
+    known_refs = set(refs)
+    for reference in reference_list:
+        if reference not in known_refs:
+            result.findings.append(Finding(
+                "SG011", "error", f"dependency references unknown component: {reference}", reference
+            ))
     for ref, count in refs.items():
         if count > 1:
             result.findings.append(Finding(

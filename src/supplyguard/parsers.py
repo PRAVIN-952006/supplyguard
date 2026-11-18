@@ -35,11 +35,27 @@ def detect_format(document: dict[str, Any]) -> str:
 
 def parse_components(
     document: dict[str, Any], source: str
-) -> tuple[str, list[Component], dict[str, Any]]:
+) -> tuple[str, list[Component], dict[str, Any], tuple[str, ...]]:
     format_name = detect_format(document)
     if format_name == "cyclonedx":
-        return format_name, _cyclonedx_components(document, source), _cyclonedx_metadata(document)
-    return format_name, _spdx_components(document, source), _spdx_metadata(document)
+        version = _text(document.get("specVersion"))
+        if version not in {"1.3", "1.4", "1.5", "1.6", "1.7"}:
+            raise SBOMParseError(f"unsupported CycloneDX specVersion: {version or '<missing>'}")
+        return (
+            format_name,
+            _cyclonedx_components(document, source),
+            _cyclonedx_metadata(document),
+            _cyclonedx_references(document),
+        )
+    version = _text(document.get("spdxVersion"))
+    if version not in {"SPDX-2.2", "SPDX-2.3"}:
+        raise SBOMParseError(f"unsupported SPDX version: {version or '<missing>'}")
+    return (
+        format_name,
+        _spdx_components(document, source),
+        _spdx_metadata(document),
+        _spdx_references(document),
+    )
 
 
 def _text(value: Any) -> str:
@@ -112,6 +128,35 @@ def _cyclonedx_metadata(document: dict[str, Any]) -> dict[str, Any]:
     return metadata if isinstance(metadata, dict) else {}
 
 
+def _cyclonedx_references(document: dict[str, Any]) -> tuple[str, ...]:
+    dependencies = document.get("dependencies", [])
+    if not isinstance(dependencies, list):
+        raise SBOMParseError("CycloneDX dependencies must be an array")
+    references: list[str] = []
+    for item in dependencies:
+        if not isinstance(item, dict):
+            continue
+        depends_on = item.get("dependsOn", [])
+        if isinstance(depends_on, list):
+            references.extend(value for value in depends_on if isinstance(value, str))
+    return tuple(references)
+
+
 def _spdx_metadata(document: dict[str, Any]) -> dict[str, Any]:
     keys = ("SPDXID", "name", "documentNamespace", "creationInfo")
     return {key: document[key] for key in keys if key in document}
+
+
+def _spdx_references(document: dict[str, Any]) -> tuple[str, ...]:
+    relationships = document.get("relationships", [])
+    if not isinstance(relationships, list):
+        raise SBOMParseError("SPDX relationships must be an array")
+    references: list[str] = []
+    for item in relationships:
+        if not isinstance(item, dict):
+            continue
+        for key in ("spdxElementId", "relatedSpdxElement"):
+            value = item.get(key)
+            if isinstance(value, str):
+                references.append(value)
+    return tuple(references)

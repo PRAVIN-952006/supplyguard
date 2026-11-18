@@ -4,6 +4,17 @@ SupplyGuard is an offline quality and policy auditor for CycloneDX and SPDX JSON
 
 It is intentionally not a vulnerability scanner. Tools such as OWASP Dependency-Check and Trivy answer questions about known vulnerabilities; SupplyGuard checks whether the inventory itself is complete enough to consume reliably. It performs no network access and has no API-key dependency.
 
+## Supported input
+
+The current parser intentionally supports a bounded subset of:
+
+| Format | Accepted versions | Encoding |
+| --- | --- | --- |
+| CycloneDX | 1.3, 1.4, 1.5, 1.6, 1.7 | JSON |
+| SPDX | 2.2, 2.3 | JSON |
+
+This is not full standards conformance. Unsupported versions, malformed JSON, non-object documents, and files over 10 MiB are rejected explicitly. XML, Protobuf, SPDX 3, schema validation, and complete relationship semantics are outside the current release.
+
 ## Why it exists
 
 SBOMs are useful only when their component identity and metadata are trustworthy. In practice, generated documents can contain duplicate references, missing versions, absent package URLs, or empty metadata. These defects make later correlation and policy decisions unreliable while remaining easy to miss in a large JSON document.
@@ -34,7 +45,7 @@ JSON file -> bounded loader -> format detector/parser -> normalized components
                                                     -> policy auditor -> text/JSON report
 ```
 
-The parser normalizes the small common subset needed for quality checks: component reference, name, version, purl, supplier, and license. The auditor applies deterministic rules and never downloads data or executes input-controlled commands.
+The parser normalizes the small common subset needed for quality checks: component reference, name, version, purl, supplier, and license. It also checks that dependency references point to known component references. The auditor applies deterministic rules and never downloads data or executes input-controlled commands.
 
 ## Security model
 

@@ -37,6 +37,7 @@ class Finding:
 class AuditResult:
     format: str
     components: list[Component] = field(default_factory=list)
+    references: tuple[str, ...] = ()
     findings: list[Finding] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -59,5 +60,6 @@ class AuditResult:
             "metadata": self.metadata,
             "counts": self.counts,
             "passed": self.passed,
+            "references": len(self.references),
             "findings": [item.as_dict() for item in self.findings],
         }
