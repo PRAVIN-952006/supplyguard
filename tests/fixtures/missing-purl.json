@@ -1,0 +1,7 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    {"type": "library", "bom-ref": "requests", "name": "requests", "version": "2.32.0"}
+  ]
+}

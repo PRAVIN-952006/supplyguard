@@ -1,0 +1,16 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "example",
+  "documentNamespace": "https://example.invalid/supplyguard",
+  "creationInfo": {"created": "2026-11-18T00:00:00Z"},
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-requests",
+      "name": "requests",
+      "versionInfo": "2.32.0",
+      "licenseConcluded": "Apache-2.0",
+      "externalRefs": [{"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:pypi/requests@2.32.0"}]
+    }
+  ]
+}
