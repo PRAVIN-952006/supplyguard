@@ -1,6 +1,6 @@
 # Contribution opportunity assessment
 
-Reviewed 2026-11-18. These are real, active projects and issues; no external pull request was opened in this initial delivery because the available issues require project-specific context and a contribution should not be rushed.
+Reviewed 2026-11-18. These are real, active projects and issues. One focused contribution was prepared only after reproducing the issue and adding a regression test.
 
 | Project | Opportunity | Fit | Status and next step |
 | --- | --- | --- | --- |
@@ -11,3 +11,7 @@ Reviewed 2026-11-18. These are real, active projects and issues; no external pul
 | OWASP Dependency-Check | [#8862](https://github.com/dependency-check/DependencyCheck/issues/8862), Scorecard integration | Good security automation fit | Open feature request; evaluate existing architecture before proposing implementation |
 
 Selection criteria were activity, reproducibility, maintainer guidance, scope, and evidence of a genuine engineering improvement. The shortlist is not a claim that any issue is unassigned or guaranteed to accept a contribution; issue status must be rechecked immediately before work.
+
+## Submitted contribution
+
+* [Safety CLI #931](https://github.com/pyupio/safety/pull/931) addresses [issue #921](https://github.com/pyupio/safety/issues/921), where malformed installed distribution metadata could crash pytest configuration. The focused regression test passed. The full suite was also run, but sandbox-dependent network/auth/cache/CLI failures were reported transparently in the PR; merge or acceptance is not claimed.
